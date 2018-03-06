@@ -1,0 +1,99 @@
+<!--AndrewJLamers March 2018 -->
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Boilerplate Material-->
+    <meta charset="utf-8">
+    <title>HEAVY METAL MAPPING</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- icons -->
+    <link rel="shortcut icon" href="img/festival.png">
+    <link rel="apple-touch-icon" href="img/festival.png">
+    
+    <!-- reference CSS's -->
+    <link rel="stylesheet" href="lib/leaflet.css">
+    <link rel="stylesheet" href="css/style.css">
+    
+    
+    <!-- JavaScript references -->
+    <script src="js/jQuery.js"></script>
+    <script src="js/jquery-3.3.1.js"></script>
+    
+    <!-- GetBootstrap.com - BootstrapCDN references-->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    
+    <!-- Override Bootstrap CSS -->
+    <style>.navbar-inverse .navbar-brand {color: whitesmoke;}</style>
+    
+</head>
+
+    
+<body>
+    <!-- I wanted to use a navigation bar
+            Yes, even though it takes away from the size of the map
+            The intent was to include other functionality that I didn't get to -->
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            
+            <!-- Navigation bar logo and title -->
+            <div class="navbar-header">
+                <a href="index.html" class="navbar-brand">Number of Heavy Metal bands formed from 2000 to 2010</a>
+                <img src="img/white.png" width="50" height="50">
+            </div>
+            <div>
+                <!-- Right side of navigation bar -->
+                <ul class="nav navbar-nav navbar-right">                    
+                    <!-- drop down menu -->
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">About the project </a>
+                        <ul class="dropdown-menu">
+                            I didn't get to finish this
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            </div>
+            </nav>
+            
+            
+            <!-- Sorting buttons -->
+            <!-- When I couldn't get the slide bar to work properly
+                I looked at filtering via selecting items in a drop down menu
+                Once I couldn't get that to work, I attempted to take inspiration from
+                Ian Bachman-Sanders' example, but also failed to recreate the functionality -->
+        
+                <div>
+			         <div class="leaflet-top leaflet-right">
+				        <div class="leaflet-control">
+			    	<nav class='menu'>
+					  <a href='#' class='active' data-filter='bands_TOTAL' id="showAll">Show Total Bands</a>
+					  <a href='#' data-filter='bands_2000'>2000</a>
+					  <a href='#' data-filter='bands_2001'>2001</a>
+					  <a href='#' data-filter='bands_2002'>2002</a>
+					  <a href='#' data-filter='bands_2003'>2003</a>
+					  <a href='#' data-filter='bands_2004'>2004</a>
+					  <a href='#' data-filter='bands_2005'>2005</a>
+                      <a href='#' data-filter='bands_2006'>2006</a>
+                      <a href='#' data-filter='bands_2007'>2007</a>
+                      <a href='#' data-filter='bands_2008'>2008</a>
+                      <a href='#' data-filter='bands_2009'>2009</a>
+                      <a href='#' data-filter='bands_2010'>2010</a>
+					</nav>
+				</div>
+			</div>
+    	</div>
+    
+    <!-- Call in map and data panel-->
+    <div id="map"></div>
+    <div id="panel"></div>
+    <div id="panel2"></div>
+    
+    <!-- additional scripts -->
+    <script src="lib/leaflet.js"></script>
+    <script src="js/main.js"></script>
+    
+</body>
+</html>

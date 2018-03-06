@@ -1,0 +1,23 @@
+City,bands_2000,bands_2001,bands_2002,bands_2003,bands_2004,bands_2005,bands_2006,bands_2007,bands_2008,bands_2009,bands_2010,bands_TOTAL,DESC,latitude,longitude,name
+Tokyo,13,9,25,22,19,24,15,17,29,14,9,196,"Tokyo, Japan",35.6840782,139.8088531,Tokyo
+Beijing,4,7,5,7,5,5,4,6,7,3,4,57,"Beijing, China",39.9046898,116.4071732,Beijing
+Bergen,7,7,6,8,9,14,8,2,9,4,10,84,"Bergen, Norway",60.3906898,5.3327398,Bergen
+Berlin,20,12,14,22,25,17,24,23,24,19,18,208,"Berlin, Germany",52.5160408,13.3769102,Berlin
+Cairo,0,1,0,1,1,1,3,2,0,6,1,16,"Cairo, Egypt",30.0499096,31.2486,Cairo
+Cape Town,1,1,0,1,1,3,4,2,3,7,3,26,"Cape Town, South Africa",-33.9190903,18.4219894,Cape Town
+Chicago,17,19,22,27,22,24,31,30,20,29,25,166,"Chicago, Illinois",41.8842506,-87.6324463,Chicago
+Gothenburg,8,19,10,16,17,23,13,20,17,23,15,181,"Gothenburg, Sweden",57.7006683,11.9682198,Gothenburg
+London,8,18,21,28,26,29,39,35,32,30,34,300,"London, England",51.5064201,-0.12721,London
+Los Angeles,16,16,11,22,30,46,42,30,25,34,30,302,"Los Angeles, California",34.0534897,-118.2453232,Los Angeles
+Mexico City,22,17,21,21,37,26,39,34,32,44,36,329,"Mexico City, Mexico",19.4319401,-99.1331482,Mexico City
+Miami,2,3,3,3,6,4,4,4,7,3,6,45,"Miami, Florida",25.7748108,-80.197731,Miami
+Minneapolis,4,3,5,9,8,14,10,8,10,8,10,89,"Minneapolis, Minnesota",44.9790192,-93.2649384,Minneapolis
+Moscow,25,31,46,53,50,56,41,60,54,41,44,501,"Moscow, Russia",55.7569618,37.6150093,Moscow
+Mumbai,1,1,0,6,0,3,3,2,4,5,3,28,"Mumbai, Maharashtra",18.9401207,72.8348618,Mumbai
+New York City,19,23,22,17,24,33,21,18,20,19,15,231,"New York City, New York",40.71455,-74.0071411,New York City
+Paris,28,32,31,44,32,28,31,39,22,16,28,332,"Paris, Île-de-France",48.8572083,2.34144,Paris
+Rio de Janeiro,23,28,13,20,25,24,32,16,22,11,20,234,"Rio de Janeiro, Rio de Janeiro",-22.9121609,-43.1750107,Rio de Janeiro
+Santiago,31,28,29,44,45,43,58,46,47,46,44,461,"Santiago, Chile",-33.4372215,-70.6500168,Santiago
+Shanghai,0,1,1,0,2,1,0,1,0,0,0,6,"Shanghai, China",31.2303696,121.4737015,Shanghai
+Toronto,7,8,14,11,15,24,22,13,10,19,21,164,"Toronto, Ontario",43.6486893,-79.385437,Toronto
+Vancouver,4,1,10,11,11,20,14,16,15,16,7,125,"Vancouver, British Columbia",49.2603798,-123.1133575,Vancouver
