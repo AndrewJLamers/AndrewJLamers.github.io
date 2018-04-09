@@ -1,248 +1,426 @@
-//Create the map
-function createMap(){
-    //create the map
-    var map = L.map('map',{
-    center: [20, -00],
-    zoom: 2.4,
-    minZoom: 2,
-    maxZoom: 4,
-    zoomControl: true
-})
+//Andrew Lamers Lab 2 - GEOG575
 
-    //I restricted the zoom availability in an attempt to focus the user's goal
-    //I wanted a simple basemap and just enough zoom ability to easily see locations of the symbols
+(function () {
+//Plug CSV attributes into Variables
+    var attrArray = ["Teen", "Unmarried", "Pre-term", "Cesarean", "Low Weight"];
+    var expressed = attrArray[0];
+
+//Chart frame dimensions
+    var chartWidth = window.innerWidth * 0.50,
+        chartHeight = 500,
+        leftPadding = 25,
+        rightPadding = 2,
+        topBottomPadding = 5,
+        chartInnerWidth = chartWidth - leftPadding - rightPadding,
+        chartInnerHeight = chartHeight - topBottomPadding * 2,
+        translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
+
+//Create a scale to size bars proportionally to frame and for axis
+        var yScale = d3.scaleLinear()
+        .range([chartHeight, 0])
+        .domain([0, 55]);
     
-    //Add custom basemap from mapbox
-    L.tileLayer('https://api.mapbox.com/styles/v1/andrewjlamers/cje6jt48r8i7g2rl7wenzgvnx/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYW5kcmV3amxhbWVycyIsImEiOiJjaXNqcmtwOWEwMmtyMnRvY3kxOXQzbGlmIn0.eEJxZgEUsJXVHlUyHOWMdw', {
-    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-    minZoom: 2
-}).addTo(map);
+//Call setMap Function
+    window.onload = setMap();
 
-    //call getData function
-    getData(map);
-};
+//Set up choropleth map
+    function setMap() {
+    
+//Map frame dimensions
+        var width = window.innerWidth * 0.44,
+            height = 500;
+            
+//Create new svg container for the map
+        var map = d3.select("body")
+            .append("svg")
+            .attr("class", "map")
+            .attr("width", width)
+            .attr("height", height);
 
-//Create functionality that applies to all features
-function onEachFeature(feature, layer) {
-    //define text output into the panel
-    var panelContent = "<p><b>City:</b> " + feature.properties.City + "</p>";
+//Create Albers equal area conic projection - United States
+        var projection = d3.geoAlbers()
+            .center([5.45, 38.15])
+            .rotate([99.18, 0, 0])
+            .parallels([29.5, 45.5])
+            .scale(960)
+            .translate([width / 2, height / 1.8]);
+    
+        var path = d3.geoPath()
+            .projection(projection);
 
-    //add formatted attribute to panel content string
-    var year = attribute.split("_")[1];
-    panelContent += "<p><b>Bands formed in" + year + ":</b> " + feature.properties[attribute] + "</p>";
-
-    //popup content is now just the city name
-    var popupContent = feature.properties.City;
-
-    //bind the popup to the circle marker
-    layer.bindPopup(popupContent, {
-        offset: new L.Point(0,-options.radius),
-        closeButton: false
-    });
-
-    //event listeners to open popup on hover and fill panel on click
-    layer.on({
-        mouseover: function(){
-            this.openPopup();
-        },
-        mouseout: function(){
-            this.closePopup();
-        },
-        click: function(){
-            $("#panel").html(panelContent);
+//Use queue to parallelize asynchronous data loading
+        d3.queue()
+            .defer(d3.csv, "data/BirthStats.csv")
+            .defer(d3.json, "data/states.topojson")
+            .await(callback);
+    
+//Call spatial data and create color scale
+        function callback(error, csvData, states) {
+        
+            setGraticule(map, path);
+        
+            var usStates =  topojson.feature(states, states.objects.states).features;
+        
+            usStates = joinData(usStates, csvData);
+        
+            var colorScale = makeColorScale(csvData);
+        
+            setEnumerationUnits(usStates, map, path, colorScale);
+        
+//Add coordinated visualization to the map
+            setChart(csvData, colorScale);
+        
+//Add the dropdown menu to the map
+            createDropdown(csvData);        
         }
-    });
-    if (feature.properties) {
-        //loop to add feature property names and values to html string
-        for (var property in feature.properties){
-            popupContent += "<p>" + property + ": " + feature.properties[property] + "</p>";
-        }
-        layer.bindPopup(popupContent);
     }
+
+//Set graticule lines and elements
+    function setGraticule(map, path) {
+        var graticule = d3.geoGraticule()
+            .step([10, 10]);
+        
+        var gratBackground = map.append("path")
+            .datum(graticule.outline()) //bind graticule background
+            .attr("class", "gratBackground") //assign class for styling
+            .attr("d", path) //project graticule
+
+        
+        var gratLines = map.selectAll(".gratLines")
+            .data(graticule.lines()) 
+            .enter() 
+            .append("path") 
+            .attr("class", "gratLines") 
+            .attr("d", path); 
+    }
+  
+//Join CSV data and Map Elements
+    function joinData(usStates, csvData) {
+        for (var i=0; i<csvData.length; i++){
+        var csvRegion = csvData[i]; 
+        var csvKey = csvRegion.STATE_ABBR; 
+
+//Loop search for correct state
+        for (var a=0; a<usStates.length; a++){
+
+            var geojsonProps = usStates[a].properties; 
+            var geojsonKey = geojsonProps.STATE_ABBR; 
+
+            if (geojsonKey == csvKey){
+                attrArray.forEach(function(attr){
+                    var val = parseFloat(csvRegion[attr]); 
+                    geojsonProps[attr] = val; 
+                });
+            }
+        }
+    }
+    
+  return usStates;  
+}
+    
+function setEnumerationUnits(usStates, map, path, colorScale){
+    var regions = map.selectAll(".regions")
+        .data(usStates)
+        .enter()
+        .append("path")
+        .attr("class", function(d){
+            return "regions " + d.properties.STATE_ABBR;
+        })
+        .attr("d", path)
+        .style("fill", function(d){
+            return choropleth(d.properties, colorScale);
+        })
+        .on("mouseover", function(d){
+            highlight(d.properties);
+        })
+        .on("mouseout", function(d){
+            dehighlight(d.properties);
+        })
+        .on("mousemove", moveLabel);
+    
+    var desc = regions.append("desc")
+        .text('{"stroke": "#999", "stroke-width": "0.7px"}');
 }
 
-//Add circle markers for point features to the map
-function pointToLayer(feature, latlng, attributes){
-    //Assign the current attribute based on the first index of the attributes array
-    var attribute = attributes[0];
+//Set colors for choropleth map and chart
+function makeColorScale(data){
+    var colorClasses = [
+        "#e6d2f9",
+        "#cda5f3",
+        "#a862ea",
+        "#831fe0",
+        "#340c5a"
+    ];
+
+//Create color scale generator
+    var colorScale = d3.scaleQuantile()
+        .range(colorClasses);
+
+//Build array of all values of the expressed attribute
+    var domainArray = [];
+    for (var i=0; i<data.length; i++){
+        var val = parseFloat(data[i][expressed]);
+        domainArray.push(val);
+    }
+
+//Cluster data using ckmeans clustering algorithm to create natural breaks
+    var clusters = ss.ckmeans(domainArray, 5);
+//Reset domain array to cluster minimums
+    domainArray = clusters.map(function(d){
+        return d3.min(d);
+    });
+//Remove first value from domain array to create class breakpoints
+    domainArray.shift();
+
+//Assign array of last 4 cluster minimums as domain
+    colorScale.domain(domainArray);
+
+    return colorScale;
     
-    //create marker options
-    if (attribute.includes("bands_")){
-        var options = {
-        fillColor: "#808080",
-        color: "#ff0000",
-        weight: 2,
-        opacity: 1,
-        fillOpacity: 0.7
-    }; 
+    
+//Attempt at making a dynamic legend for the page
+    var colors = d3.scaleQuantize()
+    .range(colorbrewer.Greens[7]);
+    
+    var legend = d3.select('#legend')
+        .append('ul')
+        .attr('class', 'list-inline');
+
+    var keys = legend.selectAll('li.key')
+        .data(colors.range());
+
+    keys.enter().append('li')
+        .attr('class', 'key')
+        .style('border-top-color', String)
+        .text(function(d) {
+            var r = colors.invertExtent(d);
+            return formats.percent(r[0]);
+    });
+}
+
+//Set colors    
+function choropleth(props, colorScale){
+//Make sure attribute value is a number
+    var val = parseFloat(props[expressed]);
+
+//If attribute value exists, assign a color; otherwise assign gray
+    if (typeof val == 'number' && !isNaN(val)){
+        return colorScale(val);
     } else {
-        var options = {
-        fillColor: "#000000",
-        color: "#000000",
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0
-        };
-    }  
+        return "#999";
+    }
+}
+    
+//Set chart
+function setChart(csvData, colorScale){
+    //create a second svg element to hold the bar chart
+    var chart = d3.select("body")
+        .append("svg")
+        .attr("width", chartWidth)
+        .attr("height", chartHeight)
+        .attr("class", "chart");
+    
+//Create chart background
+    var chartBackground = chart.append("rect")
+        .attr("class", "chartBackground")
+        .attr("width", chartInnerWidth)
+        .attr("height", chartInnerHeight)
+        .attr("transform", translate);
 
-    //For each feature, determine its value for the selected attribute
-    var attValue = Number(feature.properties[attribute]);
+//Set bars for each province
+    var bars = chart.selectAll(".bar")
+        .data(csvData)
+        .enter()
+        .append("rect")
+        .sort(function(a, b){
+            return b[expressed]-a[expressed]
+        })
+        .attr("class", function(d){
+            return "bar " + d.STATE_ABBR;
+        })
+        .attr("width", chartInnerWidth / csvData.length - 1)
+        .on("mouseover", highlight)
+        .on("mouseout", dehighlight)
+        .on("mousemove", moveLabel)
 
-    //Give each feature's circle marker a radius based on its attribute value
-    options.radius = calcPropRadius(attValue);
+    var desc = bars.append("desc")
+            .text('{"stroke": "none", "stroke-width": "90px"}');
+    
+//Create a text element for the chart title
+    var chartTitle = chart.append("text")
+        .attr("x", 325)
+        .attr("y", 50)
+        .attr("class", "chartTitle");
 
-    //create circle marker layer
-    var layer = L.circleMarker(latlng, options);
+//Create vertical axis generator
+   var yAxis = d3.axisLeft(yScale)
+        .scale(yScale);
 
-    //build popup content string
-    var popupContent = "<p><b>City:</b> " + feature.properties.City + "</p><p><b>" + attribute + ":</b> " + feature.properties[attribute] + "</p>";
+//Place axis
+    var axis = chart.append("g")
+        .attr("class", "axis")
+        .attr("transform", translate)
+        .call(yAxis);
 
-    //bind the popup to the circle marker
-    layer.bindPopup(popupContent, {
-        offset: new L.Point(0,-options.radius)
-    });
+//Create frame for chart border
+    var chartFrame = chart.append("rect")
+        .attr("class", "chartFrame")
+        .attr("width", chartInnerWidth)
+        .attr("height", chartInnerHeight)
+        .attr("transform", translate);
+        
+     updateChart(bars, csvData.length, colorScale);
+        
+}
 
-    //event listeners to open popup on hover
-    layer.on({
-        mouseover: function(){
-            this.openPopup();
-        },
-        mouseout: function(){
-            this.closePopup();
-        },
-        click: function(){
-            $("#panel2").html(popupContent)
-        }
-    });
+//Create dropdown from CSV Data
+function createDropdown(csvData){
+    var dropdown = d3.select("body")
+        .append("select")
+        .attr("class", "dropdown")
+        .on("change", function(){
+            changeAttribute(this.value, csvData)
+        });
 
-    //return the circle marker to the L.geoJson pointToLayer option
-    return layer;
+//Add initial option
+    var titleOption = dropdown.append("option")
+        .attr("class", "titleOption")
+        .attr("disabled", "true")
+        .text("Select Attribute");
+
+//Add attribute name options
+    var attrOptions = dropdown.selectAll("attrOptions")
+        .data(attrArray)
+        .enter()
+        .append("option")
+        .attr("value", function(d){ return d })
+        .text(function(d){ return d });
+    }
+    
+function changeAttribute(attribute, csvData){
+//Change the expressed attribute
+    expressed = attribute;
+
+//Recreate the color scale
+    var colorScale = makeColorScale(csvData);
+
+//Recolor enumeration units
+    var regions = d3.selectAll(".regions")
+        .transition()
+        .duration(1000)
+        .style("fill", function(d){
+            return choropleth(d.properties, colorScale)
+        });
+
+   var bars = d3.selectAll(".bar")
+//Re-sort bars
+        .sort(function(a, b){
+            return b[expressed] - a[expressed];
+        })
+        .transition()
+        .delay(function(d, i){
+            return i * 20
+        })
+        .duration(500);
+
+    updateChart(bars, csvData.length, colorScale);
+}
+    
+    function updateChart(bars, n, colorScale){
+//Position bars
+    bars.attr("x", function(d, i){
+            return i * (chartInnerWidth / n) + leftPadding;
+        })
+//Size and resize bars
+        .attr("height", function(d, i){
+            return 500 - yScale(parseFloat(d[expressed]));
+        })
+        .attr("y", function(d, i){
+            return yScale(parseFloat(d[expressed])) + topBottomPadding;
+        })
+//Color and recolor bars
+        .style("fill", function(d){
+            return choropleth(d, colorScale);
+        });
+
+//Add text to chart title
+    var chartTitle = d3.select(".chartTitle")
+        .text([expressed] + " birth rates in each state");
+}
+    
+//Highlight enumeration units and bars
+function highlight(props){
+
+//Highlight stroke
+    var selected = d3.selectAll("." + props.STATE_ABBR)
+        .style("stroke", "orange")
+        .style("stroke-width", "4");
+    setLabel(props);
+}
+    
+//Create dynamic label
+function setLabel(props){
+//Label content
+    var labelAttribute = "<h1>" + props[expressed] +"%</h1>";
+
+//Create info label
+    var infolabel = d3.select("body")
+        .append("div")
+        .attr("class", "infolabel")
+        .attr("FID", props.STATE_ABBR + "_label")
+        .html(labelAttribute);
+
+//Define label content    
+    var regionName = infolabel.append("div")
+        .attr("class", "labelname")
+        .html(props.STATE_NAME);
 };
 
-function createPropSymbols(data, map, attributes){
-    //create a Leaflet GeoJSON layer and add it to the map
-    L.geoJson(data, {
-        pointToLayer: function(feature, latlng){
-            return pointToLayer(feature, latlng, attributes);
-        }
-    }).addTo(map);
-}
+//Reset the element style on mouseout
+function dehighlight(props){
+    var selected = d3.selectAll("." + props.STATE_ABBR)
+        .style("stroke", function(){
+            return getStyle(this, "stroke")
+        })
+        .style("stroke-width", function(){
+            return getStyle(this, "stroke-width")
+        })
+    d3.select(".infolabel")
+        .remove();
 
-function calcPropRadius(attValue) {
-    //scale factor to adjust symbol size evenly
-    var scaleFactor = 1.5;
-    //area based on attribute value and scale factor
-    var area = attValue * scaleFactor;
-    //radius calculated based on area
-    var radius = Math.sqrt(area/Math.PI);
+    function getStyle(element, styleName){
+        var styleText = d3.select(element)
+            .select("desc")
+            .text();
 
-    return radius;
-}
+        var styleObject = JSON.parse(styleText);
 
-//Create new sequence controls
-function createSequenceControls(map){
-    //create range input element (slider)     
-    $('#panel').append('<input class="range-slider" type="range">');
-
-    //set slider attributes 
-    $('.range-slider').attr({
-        max: 10, //2000 to 2010
-        min: 0,
-        value: 0,
-        step: 1
-    });
-}
-function processData(data){
-    //empty array to hold attributes
-    var attributes = [];
-
-    //properties of the first feature in the dataset
-    var properties = data.features[0].properties;
-
-    //push each attribute name into attributes array
-    for (var attribute in properties){
-        
-        //only take attributes with values
-        if (attribute.indexOf("bands_") >-1){
-            attributes.push(attribute);
-        }
+        return styleObject[styleName];
     }
-
-    //check result
-    console.log(attributes);
-
-    return attributes;
 }
+    
+//Move info label with mouse
+function moveLabel(){
+    //get width of label
+    var labelWidth = d3.select(".infolabel")
+        .node()
+        .getBoundingClientRect()
+        .width;
+    
+//Use mousemove event to set label
+    var x1 = d3.event.clientX + 10,
+        y1 = d3.event.clientY - 75,
+        x2 = d3.event.clientX - labelWidth - 10,
+        y2 = d3.event.clientY + 25;
 
-//Import GeoJSON data
-function getData(map){
-    //load the data
-    $.ajax("data/metal.geojson", {
-        dataType: "json",
-        success: function(response){
-            //create an attributes array
-            var attributes = processData(response);
+//Horizontal label coordinate, testing for overflow
+    var x = d3.event.clientX > window.innerWidth - labelWidth - 20 ? x2 : x1; 
+//Vertical label coordinate, testing for overflow
+    var y = d3.event.clientY < 75 ? y2 : y1; 
 
-            createPropSymbols(response, map, attributes);
-            createSequenceControls(map, attributes);
-        }
-    });
+    d3.select(".infolabel")
+        .style("left", x + "px")
+        .style("top", y + "px");
 }
-//Create slider buttons
-  $('#panel').append('<button class="skip" id="reverse">Reverse</button>');
-    $('#panel').append('<button class="skip" id="forward">Skip</button>');
-  $('#reverse').html('<img src="img/reverse.png">');
-    $('#forward').html('<img src="img/forward.png">');
-
-//Create functionality for buttons
-
-     //Click listener for buttons
-    $('.skip').click(function(){
-        //get the old index value
-        var index = $('.range-slider').val();
-
-        //Increment or decrement depending on button clicked
-        if ($(this).attr('id') == 'forward'){
-            index++;
-        } else if ($(this).attr('id') == 'reverse'){
-            index--; 
-        }
-
-        //Update slider
-        $('.range-slider').val(index);
-        
-        //New attribute to update symbols
-        updatePropSymbols(map, attributes[index]);
-        
-        
-        
-//Resize proportional symbols according to new attribute values
-function updatePropSymbols(map, attribute){
-    map.eachLayer(function(layer){
-        
-        if (layer.feature && layer.feature.properties[attribute]){
-            //access feature properties
-            var props = layer.feature.properties;
-
-            //update each feature's radius based on new attribute values
-            var radius = calcPropRadius(props[attribute]);
-            layer.setRadius(radius);
-
-            //add city to popup content string
-            var popupContent = "<p><b>City:</b> " + props.City + "</p>";
-
-            //add formatted attribute to panel content string
-            var year = attribute.split("_")[0];
-            popupContent += "<p><b>Bands formed in " + year + ":</b> " + props[attribute] + "</p>";
-
-            //replace the layer popup
-            layer.bindPopup(popupContent, {
-                offset: new L.Point(0,-radius)
-            });
-        }
-    });
-}
-        
-    });
-
-$(document).ready(createMap);
+    
+})();
