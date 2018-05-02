@@ -343,7 +343,7 @@ function setChart2(csvData2, colorScale2){
 
 //Place axis
     var axis2 = chart2.append("g")
-        .attr("class", "axis")
+        .attr("class", "axis2")
         .attr("transform", translate2)
         .call(yAxis2);
 
@@ -404,7 +404,7 @@ function setChart3(csvData3, colorScale3){
 
 //Place axis
     var axis3 = chart3.append("g")
-        .attr("class", "axis")
+        .attr("class", "axis3")
         .attr("transform", translate3)
         .call(yAxis3);
 
@@ -464,7 +464,7 @@ function setChart4(csvData4, colorScale4){
 
 //Place axis
     var axis4 = chart4.append("g")
-        .attr("class", "axis")
+        .attr("class", "axis4")
         .attr("transform", translate4)
         .call(yAxis4);
 
@@ -508,12 +508,66 @@ function changeAttribute(attribute, csvData,csvData2,csvData3,csvData4){
 	expressed2 = attribute;
 	expressed3 = attribute;
 	expressed4 = attribute;
+
+
+//dynamic yaxis
+    var changeArray = [];
+    for (var i = 0; i < csvData.length; i++) {
+        var val = parseFloat(csvData[i][expressed]);
+        changeArray.push(val);
+    }
+
+    var maxValue = d3.max(changeArray);
+    var minValue = d3.min(changeArray);
+if (maxValue == 654) {
+    yScale = d3.scaleLinear()
+        .range([chartHeight, 0])
+        .domain([0, 350]);
+	var yAxis = d3.axisLeft()
+        .scale(yScale);
+
+    d3.selectAll(".axis")
+        .call(yAxis);
+}
+else if (maxValue == 927) {
+    yScale = d3.scaleLinear()
+        .range([chartHeight, 0])
+        .domain([0, 450]);
+	var yAxis = d3.axisLeft()
+        .scale(yScale);
+
+    d3.selectAll(".axis")
+        .call(yAxis);
+}
+else if (maxValue > 700) {
+    yScale = d3.scaleLinear()
+        .range([chartHeight, 0])
+        .domain([0, 400]);
+	var yAxis = d3.axisLeft()
+        .scale(yScale);
+
+    d3.selectAll(".axis")
+        .call(yAxis);
+}
+
+else if (maxValue < 600) {
+	yScale = d3.scaleLinear()
+        .range([chartHeight, 0])
+        .domain([0, 300]);
+	var yAxis = d3.axisLeft()
+        .scale(yScale);
+
+    d3.selectAll(".axis")
+        .call(yAxis);
+}
+    
 	
 //Recreate the color scale
     var colorScale = makeColorScale(csvData);
 	var colorScale2 = makeColorScale(csvData2);
 	var colorScale3 = makeColorScale(csvData3);
 	var colorScale4 = makeColorScale(csvData4);
+
 //Recolor enumeration units
     var regions = d3.selectAll(".regions")
         .transition()
@@ -535,7 +589,7 @@ function changeAttribute(attribute, csvData,csvData2,csvData3,csvData4){
    var bars2 = d3.selectAll(".bar2")
    //Re-sort bars
         .sort(function(a, b){
-            return b[expressed] - a[expressed];
+            return b[expressed2] - a[expressed2];
         })
         .transition()
         .delay(function(d, i){
@@ -545,7 +599,7 @@ function changeAttribute(attribute, csvData,csvData2,csvData3,csvData4){
    var bars3 = d3.selectAll(".bar3")
    //Re-sort bars
         .sort(function(a, b){
-            return b[expressed] - a[expressed];
+            return b[expressed3] - a[expressed3];
         })
         .transition()
         .delay(function(d, i){
@@ -556,7 +610,7 @@ function changeAttribute(attribute, csvData,csvData2,csvData3,csvData4){
    
 //Re-sort bars
         .sort(function(a, b){
-            return b[expressed] - a[expressed];
+            return b[expressed4] - a[expressed4];
         })
         .transition()
         .delay(function(d, i){

@@ -56,16 +56,24 @@ H1 {
 }
 
 .axis path,
-.axis line {
+.axis line, .axis2 path,
+.axis2 line, .axis3 path,
+.axis3 line, .axis4 path,
+.axis4 line {
     fill: none;
     stroke: #000;
     stroke-width: 1px;
     shape-rendering: crispEdges;
 }
-
 .axis text {
     font-family: sans-serif;
-    font-size: 1.2em;
+    font-size: 1.5em;
+    fill: #999;
+}
+
+.axis2 text, .axis3 text, .axis4 text {
+    font-family: sans-serif;
+    font-size: 1.3em;
     fill: #999;
 }
 
