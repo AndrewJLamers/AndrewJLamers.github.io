@@ -1,24 +1,60 @@
-//Andrew Lamers Lab 2 - GEOG575
+//Andrew Lamers - GEOG575
 
 (function () {
 //Plug CSV attributes into Variables
-    var attrArray = ["Teen", "Unmarried", "Pre-term", "Cesarean", "Low Weight"];
+    var attrArray = ["2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016"];
     var expressed = attrArray[0];
+	var expressed2 = attrArray[0];
+	var expressed3 = attrArray[0];
+	var expressed4 = attrArray[0];
 
 //Chart frame dimensions
     var chartWidth = window.innerWidth * 0.50,
         chartHeight = 500,
-        leftPadding = 25,
+        leftPadding = 50,
         rightPadding = 2,
-        topBottomPadding = 5,
+        topBottomPadding = 10,
         chartInnerWidth = chartWidth - leftPadding - rightPadding,
         chartInnerHeight = chartHeight - topBottomPadding * 2,
         translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
-
+	var chartWidth2 = window.innerWidth * 0.32,
+        chartHeight2 = 375,
+        leftPadding2 = 50,
+        rightPadding2 = 2,
+        topBottomPadding2 = 10,
+        chartInnerWidth2 = chartWidth2 - leftPadding2 - rightPadding2,
+        chartInnerHeight2 = chartHeight2 - topBottomPadding2 * 2,
+        translate2 = "translate(" + leftPadding2 + "," + topBottomPadding2 + ")";
+	var chartWidth3 = window.innerWidth * 0.32,
+        chartHeight3 = 375,
+        leftPadding3 = 50,
+        rightPadding3 = 2,
+        topBottomPadding3 = 10,
+        chartInnerWidth3 = chartWidth3 - leftPadding3 - rightPadding3,
+        chartInnerHeight3 = chartHeight3 - topBottomPadding3 * 2,
+        translate3 = "translate(" + leftPadding3 + "," + topBottomPadding3 + ")";
+	var chartWidth4 = window.innerWidth * 0.32,
+        chartHeight4 = 375,
+        leftPadding4 = 50,
+        rightPadding4 = 2,
+        topBottomPadding4 = 10,
+        chartInnerWidth4 = chartWidth4 - leftPadding4 - rightPadding4,
+        chartInnerHeight4 = chartHeight4 - topBottomPadding4 * 2,
+        translate4 = "translate(" + leftPadding4 + "," + topBottomPadding4 + ")";
+    
 //Create a scale to size bars proportionally to frame and for axis
         var yScale = d3.scaleLinear()
         .range([chartHeight, 0])
-        .domain([0, 55]);
+        .domain([0, 300]);
+		var yScale2 = d3.scaleLinear()
+        .range([chartHeight2, 0])
+        .domain([0, 260]);
+		var yScale3 = d3.scaleLinear()
+        .range([chartHeight3, 0])
+        .domain([0, .55]);
+		var yScale4 = d3.scaleLinear()
+        .range([chartHeight4, 0])
+        .domain([0, 80000]);
     
 //Call setMap Function
     window.onload = setMap();
@@ -50,28 +86,37 @@
 
 //Use queue to parallelize asynchronous data loading
         d3.queue()
-            .defer(d3.csv, "data/BirthStats.csv")
+            .defer(d3.csv, "data/Breweries.csv")
+			.defer(d3.csv, "data/OLS.csv")
+			.defer(d3.csv, "data/GiniIndex.csv")
+			.defer(d3.csv, "data/MedianIncome.csv")
             .defer(d3.json, "data/states.topojson")
             .await(callback);
     
 //Call spatial data and create color scale
-        function callback(error, csvData, states) {
+        function callback(error, csvData,csvData2,csvData3,csvData4,states) {
         
             setGraticule(map, path);
         
             var usStates =  topojson.feature(states, states.objects.states).features;
         
-            usStates = joinData(usStates, csvData);
+            usStates = joinData(usStates, csvData,csvData2,csvData3,csvData4);
         
             var colorScale = makeColorScale(csvData);
+			var colorScale2 = makeColorScale(csvData2);
+			var colorScale3 = makeColorScale(csvData3);
+			var colorScale4 = makeColorScale(csvData4);
         
             setEnumerationUnits(usStates, map, path, colorScale);
         
 //Add coordinated visualization to the map
-            setChart(csvData, colorScale);
+            setChart(csvData,colorScale);
+			setChart2(csvData2,colorScale2);
+			setChart3(csvData3,colorScale3);
+			setChart4(csvData4,colorScale4);
         
 //Add the dropdown menu to the map
-            createDropdown(csvData);        
+            createDropdown(csvData,csvData2,csvData3,csvData4);        
         }
     }
 
@@ -145,11 +190,10 @@ function setEnumerationUnits(usStates, map, path, colorScale){
 //Set colors for choropleth map and chart
 function makeColorScale(data){
     var colorClasses = [
-        "#e6d2f9",
-        "#cda5f3",
-        "#a862ea",
-        "#831fe0",
-        "#340c5a"
+        "#FF964C",
+        "#FF6900",
+        "#CC5400",
+        "#7F3500",
     ];
 
 //Create color scale generator
@@ -176,26 +220,6 @@ function makeColorScale(data){
     colorScale.domain(domainArray);
 
     return colorScale;
-    
-    
-//Attempt at making a dynamic legend for the page
-    var colors = d3.scaleQuantize()
-    .range(colorbrewer.Greens[7]);
-    
-    var legend = d3.select('#legend')
-        .append('ul')
-        .attr('class', 'list-inline');
-
-    var keys = legend.selectAll('li.key')
-        .data(colors.range());
-
-    keys.enter().append('li')
-        .attr('class', 'key')
-        .style('border-top-color', String)
-        .text(function(d) {
-            var r = colors.invertExtent(d);
-            return formats.percent(r[0]);
-    });
 }
 
 //Set colors    
@@ -211,6 +235,7 @@ function choropleth(props, colorScale){
     }
 }
     
+	
 //Set chart
 function setChart(csvData, colorScale){
     //create a second svg element to hold the bar chart
@@ -272,21 +297,201 @@ function setChart(csvData, colorScale){
      updateChart(bars, csvData.length, colorScale);
         
 }
+function setChart2(csvData2, colorScale2){
+    //create a second svg element to hold the bar chart
+    var chart2 = d3.select("body")
+        .append("svg")
+        .attr("width", chartWidth2)
+        .attr("height", chartHeight2)
+        .attr("class", "chart2");
+    
+//Create chart background
+    var chartBackground2 = chart2.append("rect")
+        .attr("class", "chartBackground")
+        .attr("width", chartInnerWidth2)
+        .attr("height", chartInnerHeight2)
+        .attr("transform", translate2);
 
+//Set bars for each province
+    var bars2 = chart2.selectAll(".bar2")
+        .data(csvData2)
+        .enter()
+        .append("rect")
+        .sort(function(a, b){
+            return b[expressed2]-a[expressed2]
+        })
+        .attr("class", function(d){
+            return "bar2 " + d.STATE_ABBR;
+        })
+        .attr("width", chartInnerWidth2 / csvData2.length - 1)
+        .on("mouseover", highlight)
+        .on("mouseout", dehighlight)
+        .on("mousemove", moveLabel)
+
+    var desc = bars2.append("desc")
+            .text('{"stroke": "none", "stroke-width": "90px"}');
+    
+//Create a text element for the chart title
+    var chartTitle2 = chart2.append("text")
+        .attr("x", 190)
+        .attr("y", 25)
+        .attr("class", "chartTitle2");
+
+//Create vertical axis generator
+   var yAxis2 = d3.axisLeft(yScale2)
+        .scale(yScale2);
+
+//Place axis
+    var axis2 = chart2.append("g")
+        .attr("class", "axis")
+        .attr("transform", translate2)
+        .call(yAxis2);
+
+//Create frame for chart border
+    var chartFrame2 = chart2.append("rect")
+        .attr("class", "chartFrame")
+        .attr("width", chartInnerWidth2)
+        .attr("height", chartInnerHeight2)
+        .attr("transform", translate2);
+
+
+     updateChart2(bars2, csvData2.length, colorScale2);
+        
+}
+function setChart3(csvData3, colorScale3){
+    //create a second svg element to hold the bar chart
+    var chart3 = d3.select("body")
+        .append("svg")
+        .attr("width", chartWidth3)
+        .attr("height", chartHeight3)
+        .attr("class", "chart3");
+    
+//Create chart background
+    var chartBackground3 = chart3.append("rect")
+        .attr("class", "chartBackground")
+        .attr("width", chartInnerWidth3)
+        .attr("height", chartInnerHeight3)
+        .attr("transform", translate3);
+
+//Set bars for each province
+    var bars3 = chart3.selectAll(".bar3")
+        .data(csvData3)
+        .enter()
+        .append("rect")
+        .sort(function(a, b){
+            return b[expressed3]-a[expressed3]
+        })
+        .attr("class", function(d){
+            return "bar3 " + d.STATE_ABBR;
+        })
+        .attr("width", chartInnerWidth3 / csvData3.length - 1)
+        .on("mouseover", highlight)
+        .on("mouseout", dehighlight)
+        .on("mousemove", moveLabel)
+
+    var desc = bars3.append("desc")
+            .text('{"stroke": "none", "stroke-width": "90px"}');
+    
+//Create a text element for the chart title
+    var chartTitle3 = chart3.append("text")
+        .attr("x", 305)
+        .attr("y", 25)
+        .attr("class", "chartTitle3");
+
+//Create vertical axis generator
+   var yAxis3 = d3.axisLeft(yScale3)
+        .scale(yScale3);
+
+//Place axis
+    var axis3 = chart3.append("g")
+        .attr("class", "axis")
+        .attr("transform", translate3)
+        .call(yAxis3);
+
+//Create frame for chart border
+    var chartFrame3 = chart3.append("rect")
+        .attr("class", "chartFrame")
+        .attr("width", chartInnerWidth3)
+        .attr("height", chartInnerHeight3)
+        .attr("transform", translate3);
+        
+     updateChart3(bars3, csvData3.length, colorScale3);
+        
+}
+function setChart4(csvData4, colorScale4){
+    //create a second svg element to hold the bar chart
+    var chart4 = d3.select("body")
+        .append("svg")
+        .attr("width", chartWidth4)
+        .attr("height", chartHeight4)
+        .attr("class", "chart4");
+    
+//Create chart background
+    var chartBackground4 = chart4.append("rect")
+        .attr("class", "chartBackground")
+        .attr("width", chartInnerWidth4)
+        .attr("height", chartInnerHeight4)
+        .attr("transform", translate4);
+
+//Set bars for each province
+    var bars4 = chart4.selectAll(".bar4")
+        .data(csvData4)
+        .enter()
+        .append("rect")
+        .sort(function(a, b){
+            return b[expressed4]-a[expressed4]
+        })
+        .attr("class", function(d){
+            return "bar4 " + d.STATE_ABBR;
+        })
+        .attr("width", chartInnerWidth4 / csvData4.length - 1)
+        .on("mouseover", highlight)
+        .on("mouseout", dehighlight)
+        .on("mousemove", moveLabel)
+
+    var desc = bars4.append("desc")
+            .text('{"stroke": "none", "stroke-width": "90px"}');
+    
+//Create a text element for the chart title
+    var chartTitle4 = chart4.append("text")
+        .attr("x", 245)
+        .attr("y", 25)
+        .attr("class", "chartTitle4");
+
+//Create vertical axis generator
+   var yAxis4 = d3.axisLeft(yScale4)
+        .scale(yScale4);
+
+//Place axis
+    var axis4 = chart4.append("g")
+        .attr("class", "axis")
+        .attr("transform", translate4)
+        .call(yAxis4);
+
+//Create frame for chart border
+    var chartFrame4 = chart4.append("rect")
+        .attr("class", "chartFrame")
+        .attr("width", chartInnerWidth4)
+        .attr("height", chartInnerHeight4)
+        .attr("transform", translate4);
+        
+     updateChart4(bars4, csvData4.length, colorScale4);      
+}
+	
 //Create dropdown from CSV Data
-function createDropdown(csvData){
+function createDropdown(csvData,csvData2,csvData3,csvData4){
     var dropdown = d3.select("body")
         .append("select")
         .attr("class", "dropdown")
         .on("change", function(){
-            changeAttribute(this.value, csvData)
+            changeAttribute(this.value, csvData,csvData2,csvData3,csvData4)
         });
 
 //Add initial option
     var titleOption = dropdown.append("option")
         .attr("class", "titleOption")
         .attr("disabled", "true")
-        .text("Select Attribute");
+        .text("Select Year");
 
 //Add attribute name options
     var attrOptions = dropdown.selectAll("attrOptions")
@@ -297,13 +502,18 @@ function createDropdown(csvData){
         .text(function(d){ return d });
     }
     
-function changeAttribute(attribute, csvData){
+function changeAttribute(attribute, csvData,csvData2,csvData3,csvData4){
 //Change the expressed attribute
     expressed = attribute;
-
+	expressed2 = attribute;
+	expressed3 = attribute;
+	expressed4 = attribute;
+	
 //Recreate the color scale
     var colorScale = makeColorScale(csvData);
-
+	var colorScale2 = makeColorScale(csvData2);
+	var colorScale3 = makeColorScale(csvData3);
+	var colorScale4 = makeColorScale(csvData4);
 //Recolor enumeration units
     var regions = d3.selectAll(".regions")
         .transition()
@@ -313,6 +523,37 @@ function changeAttribute(attribute, csvData){
         });
 
    var bars = d3.selectAll(".bar")
+   //Re-sort bars
+        .sort(function(a, b){
+            return b[expressed] - a[expressed];
+        })
+        .transition()
+        .delay(function(d, i){
+            return i * 20
+        })
+        .duration(500);
+   var bars2 = d3.selectAll(".bar2")
+   //Re-sort bars
+        .sort(function(a, b){
+            return b[expressed] - a[expressed];
+        })
+        .transition()
+        .delay(function(d, i){
+            return i * 20
+        })
+        .duration(500);
+   var bars3 = d3.selectAll(".bar3")
+   //Re-sort bars
+        .sort(function(a, b){
+            return b[expressed] - a[expressed];
+        })
+        .transition()
+        .delay(function(d, i){
+            return i * 20
+        })
+        .duration(500);
+   var bars4 = d3.selectAll(".bar4")
+   
 //Re-sort bars
         .sort(function(a, b){
             return b[expressed] - a[expressed];
@@ -322,11 +563,15 @@ function changeAttribute(attribute, csvData){
             return i * 20
         })
         .duration(500);
+	
 
-    updateChart(bars, csvData.length, colorScale);
+    updateChart(bars, csvData.length,colorScale);
+	updateChart2(bars2, csvData2.length,colorScale2);
+	updateChart3(bars3, csvData3.length,colorScale3);
+	updateChart4(bars4, csvData4.length,colorScale4);
 }
     
-    function updateChart(bars, n, colorScale){
+function updateChart(bars, n, colorScale){
 //Position bars
     bars.attr("x", function(d, i){
             return i * (chartInnerWidth / n) + leftPadding;
@@ -345,15 +590,78 @@ function changeAttribute(attribute, csvData){
 
 //Add text to chart title
     var chartTitle = d3.select(".chartTitle")
-        .text([expressed] + " birth rates in each state");
+        .text("Brewery Count for Each State (" + [expressed] +")");
 }
-    
+function updateChart2(bars2, n, colorScale2){
+//Position bars
+    bars2.attr("x", function(d, i){
+            return i * (chartInnerWidth2 / n) + leftPadding2;
+        })
+//Size and resize bars
+        .attr("height", function(d, i){
+            return 500 - yScale2(parseFloat(d[expressed2]));
+        })
+        .attr("y", function(d, i){
+            return yScale2(parseFloat(d[expressed2])) + topBottomPadding2;
+        })
+//Color and recolor bars
+        .style("fill", function(d){
+            return choropleth(d, colorScale2);
+        });
+
+//Add text to chart title
+    var chartTitle2 = d3.select(".chartTitle2")
+        .text("Expected Brewery Count for Each State (" + [expressed2] +")");
+}
+function updateChart3(bars3, n, colorScale3){
+//Position bars
+    bars3.attr("x", function(d, i){
+            return i * (chartInnerWidth3 / n) + leftPadding3;
+        })
+//Size and resize bars
+        .attr("height", function(d, i){
+            return 500 - yScale3(parseFloat(d[expressed3]));
+        })
+        .attr("y", function(d, i){
+            return yScale3(parseFloat(d[expressed3])) + topBottomPadding3;
+        })
+//Color and recolor bars
+        .style("fill", function(d){
+            return choropleth(d, colorScale3);
+        });
+
+//Add text to chart title
+    var chartTitle3 = d3.select(".chartTitle3")
+        .text("Gini Index for Each State (" + [expressed3] +")");
+}
+function updateChart4(bars4, n, colorScale4){
+//Position bars
+    bars4.attr("x", function(d, i){
+            return i * (chartInnerWidth4 / n) + leftPadding4;
+        })
+//Size and resize bars
+        .attr("height", function(d, i){
+            return 500 - yScale4(parseFloat(d[expressed4]));
+        })
+        .attr("y", function(d, i){
+            return yScale4(parseFloat(d[expressed4])) + topBottomPadding4;
+        })
+//Color and recolor bars
+        .style("fill", function(d){
+            return choropleth(d, colorScale4);
+        });
+
+//Add text to chart title
+    var chartTitle4 = d3.select(".chartTitle4")
+        .text("Median Income($) for Each State (" + [expressed4] + ")");
+	}  
+	
 //Highlight enumeration units and bars
 function highlight(props){
 
 //Highlight stroke
     var selected = d3.selectAll("." + props.STATE_ABBR)
-        .style("stroke", "orange")
+        .style("stroke", "lightgreen")
         .style("stroke-width", "4");
     setLabel(props);
 }
@@ -361,7 +669,7 @@ function highlight(props){
 //Create dynamic label
 function setLabel(props){
 //Label content
-    var labelAttribute = "<h1>" + props[expressed] +"%</h1>";
+    var labelAttribute = "<h1>" + props[expressed] +"</h1>";
 
 //Create info label
     var infolabel = d3.select("body")
