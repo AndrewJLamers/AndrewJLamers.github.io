@@ -51,7 +51,7 @@
         .domain([0, 260]);
 		var yScale3 = d3.scaleLinear()
         .range([chartHeight3, 0])
-        .domain([0, .55]);
+        .domain([0, .8]);
 		var yScale4 = d3.scaleLinear()
         .range([chartHeight4, 0])
         .domain([0, 80000]);
@@ -273,7 +273,7 @@ function setChart(csvData, colorScale){
     
 //Create a text element for the chart title
     var chartTitle = chart.append("text")
-        .attr("x", 325)
+        .attr("x", 425)
         .attr("y", 50)
         .attr("class", "chartTitle");
 
@@ -333,8 +333,8 @@ function setChart2(csvData2, colorScale2){
     
 //Create a text element for the chart title
     var chartTitle2 = chart2.append("text")
-        .attr("x", 190)
-        .attr("y", 25)
+        .attr("x", 205)
+        .attr("y", 35)
         .attr("class", "chartTitle2");
 
 //Create vertical axis generator
@@ -394,8 +394,8 @@ function setChart3(csvData3, colorScale3){
     
 //Create a text element for the chart title
     var chartTitle3 = chart3.append("text")
-        .attr("x", 305)
-        .attr("y", 25)
+        .attr("x", 265)
+        .attr("y", 35)
         .attr("class", "chartTitle3");
 
 //Create vertical axis generator
@@ -454,8 +454,8 @@ function setChart4(csvData4, colorScale4){
     
 //Create a text element for the chart title
     var chartTitle4 = chart4.append("text")
-        .attr("x", 245)
-        .attr("y", 25)
+        .attr("x", 265)
+        .attr("y", 35)
         .attr("class", "chartTitle4");
 
 //Create vertical axis generator
@@ -482,7 +482,7 @@ function setChart4(csvData4, colorScale4){
 function createDropdown(csvData,csvData2,csvData3,csvData4){
     var dropdown = d3.select("body")
         .append("select")
-        .attr("class", "dropdown")
+        .attr("class", "dropdownYear")
         .on("change", function(){
             changeAttribute(this.value, csvData,csvData2,csvData3,csvData4)
         });
@@ -686,7 +686,7 @@ function updateChart3(bars3, n, colorScale3){
 
 //Add text to chart title
     var chartTitle3 = d3.select(".chartTitle3")
-        .text("Gini Index for Each State (" + [expressed3] +")");
+        .text("Inverse Gini Index for Each State (" + [expressed3] +")");
 }
 function updateChart4(bars4, n, colorScale4){
 //Position bars
@@ -715,8 +715,8 @@ function highlight(props){
 
 //Highlight stroke
     var selected = d3.selectAll("." + props.STATE_ABBR)
-        .style("stroke", "lightgreen")
-        .style("stroke-width", "4");
+        .style("stroke", "#00FFFF")
+        .style("stroke-width", "5");
     setLabel(props);
 }
     
@@ -726,14 +726,14 @@ function setLabel(props){
     var labelAttribute = "<h1>" + props[expressed] +"</h1>";
 
 //Create info label
-    var infolabel = d3.select("body")
+    var infolabel2 = d3.select("body")
         .append("div")
-        .attr("class", "infolabel")
+        .attr("class", "infolabel2")
         .attr("FID", props.STATE_ABBR + "_label")
         .html(labelAttribute);
 
 //Define label content    
-    var regionName = infolabel.append("div")
+    var regionName = infolabel2.append("div")
         .attr("class", "labelname")
         .html(props.STATE_NAME);
 };
@@ -747,7 +747,7 @@ function dehighlight(props){
         .style("stroke-width", function(){
             return getStyle(this, "stroke-width")
         })
-    d3.select(".infolabel")
+    d3.select(".infolabel2")
         .remove();
 
     function getStyle(element, styleName){
@@ -764,7 +764,7 @@ function dehighlight(props){
 //Move info label with mouse
 function moveLabel(){
     //get width of label
-    var labelWidth = d3.select(".infolabel")
+    var labelWidth = d3.select(".infolabel2")
         .node()
         .getBoundingClientRect()
         .width;
@@ -780,7 +780,7 @@ function moveLabel(){
 //Vertical label coordinate, testing for overflow
     var y = d3.event.clientY < 75 ? y2 : y1; 
 
-    d3.select(".infolabel")
+    d3.select(".infolabel2")
         .style("left", x + "px")
         .style("top", y + "px");
 }
