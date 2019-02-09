@@ -5,7 +5,7 @@
  */
 
 
-@media (min-width: 400px) {
+
 body {
   background: url("img/Home.png") no-repeat center fixed;
   -webkit-background-size: 100%;
@@ -13,4 +13,4 @@ body {
   background-size: 100%;
   -o-background-size: 100%;
     background-color: black;
-    }}
+    }
