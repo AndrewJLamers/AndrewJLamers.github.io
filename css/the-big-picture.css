@@ -4,7 +4,7 @@
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-the-big-picture/blob/master/LICENSE)
  */
 body {
-  background: url("img/Home.png") no-repeat center center fixed;
+  background: url("img/Home.png") no-repeat center fixed;
   -webkit-background-size: 100%;
   -moz-background-size: 100%;
   background-size: 100%;
