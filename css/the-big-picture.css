@@ -3,15 +3,6 @@
  * Copyright 2013-2019 Start Bootstrap
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-the-big-picture/blob/master/LICENSE)
  */
-@media (min-width: 50px) {
-body {
-  background: url("img/mHome.png") no-repeat center fixed;
-  -webkit-background-size: auto;
-  -moz-background-size: auto;
-  background-size: auto;
-  -o-background-size: auto;
-    background-color: black;
-    }}
 
 
 @media (min-width: 400px) {
