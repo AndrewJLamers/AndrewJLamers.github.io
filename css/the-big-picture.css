@@ -4,10 +4,14 @@
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-the-big-picture/blob/master/LICENSE)
  */
 @media (min-width: 50px) {
-    body{
-        background-color: aqua;
-    }
-}
+body {
+  background: url("img/mHome.png") no-repeat center fixed;
+  -webkit-background-size: 100%;
+  -moz-background-size: 100%;
+  background-size: 100%;
+  -o-background-size: 100%;
+    background-color: black;
+    }}
 
 
 @media (min-width: 400px) {
