@@ -6,10 +6,10 @@
 @media (min-width: 50px) {
 body {
   background: url("img/mHome.png") no-repeat center fixed;
-  -webkit-background-size: 100%;
-  -moz-background-size: 100%;
-  background-size: 100%;
-  -o-background-size: 100%;
+  -webkit-background-size: auto;
+  -moz-background-size: auto;
+  background-size: auto;
+  -o-background-size: auto;
     background-color: black;
     }}
 
