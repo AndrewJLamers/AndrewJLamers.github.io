@@ -1,73 +1,277 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
+<meta charset="utf-8"/>
+  <head>
+    <title>NR Parks App</title>
+    <link rel="stylesheet" href="css/leaflet.css" />
+    <link rel="stylesheet" href="css/leaflet.draw.css" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="header">
+        <h1>City of New Richmond - Park Reporter</h1>
+      </div>
+      <div id="map"></div>
+      <div id="controls">
+          <p>Click points for more information, or submit a report by clicking the <img src="\data-collection\css\images\DrawIcon.png"> symbol.</br></p>
+        <input type="button" onclick="Reports()" value="Toggle Reports Layer on/off">
+        <div id="searchbox">
+        <input type="text" name="ad" value="" placeholder="Search by Park Name" id="ad" size="10" />
+        <button type="button" id="searchButton">Search</button>
+      </div>
+    </div>
 
-<head>
- 
+    <div id="dialog" title="Report Information">     
+      <form>
+        <fieldset style="border: none;">
+          <ul style="list-style-type: none; padding-left: 0px">
+            <li><label for="username"></label></li>
+            <li><input type="text" name="username" id="username" placeholder="Enter your name" class="text ui-widget-content ui-corner-all"></li>
+              <li><label for="RequestType"></label></li>
+            <li><input type="text" name="requesttype" id="requesttype" placeholder="Request Type" class="text ui-widget-content ui-corner-all"></li>
+            <li><label for="description"></label></li>
+            <li><input type="text" name="description" id="description" placeholder="Description" class="text ui-widget-content ui-corner-all"></li>
+              <li><label for="contact"></label></li>
+            <li><input type="text" name="contact" id="contact" placeholder="Phone/Email" class="text ui-widget-content ui-corner-all"></li>
+                <li><label for="ParkName"></label></li>
+            <li><input type="text" name="parkname" id="parkname" placeholder="Park Name" class="text ui-widget-content ui-corner-all"></li>
+          </ul>
+          <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+        </fieldset>
+      </form>
+    </div>
+
+    <script src="js/leaflet.js"></script>
+    <script src="js/leaflet.draw.js"></script>
+     <script src="https://cartodb-libs.global.ssl.fastly.net/carto.js/v4.0.0-beta.4/carto.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="/data-collection/js/jquery-3.3.1.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.65.1/dist/L.Control.Locate.min.css" />
+
+<script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.65.1/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+    <script>
+        
+    var aerial = L.tileLayer('https://api.mapbox.com/styles/v1/andrewjlamers/cje6jt48r8i7g2rl7wenzgvnx/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYW5kcmV3amxhbWVycyIsImEiOiJjaXNqcmtwOWEwMmtyMnRvY3kxOXQzbGlmIn0.eEJxZgEUsJXVHlUyHOWMdw'),
+        basemap = L.tileLayer('https://api.mapbox.com/styles/v1/andrewjlamers/civr1q40n00582jm9jkc1mf8q/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYW5kcmV3amxhbWVycyIsImEiOiJjaXNqcmtwOWEwMmtyMnRvY3kxOXQzbGlmIn0.eEJxZgEUsJXVHlUyHOWMdw');
+           
+    // Create Leaflet map object
+    var map = L.map('map',{ 
+        center: [45.1232020909774,-92.5373268127441 ], 
+        zoom: 14,
+        layers: [basemap]
+    });
+
+    var baseMaps = {
+        "aerial": aerial,
+        "base": basemap
+    };     
+        
+// Add Tile Layer basemap
+L.control.layers(baseMaps).addTo(map);
+     
     
-  <meta charset="utf-8">
-  <link rel="shortcut icon" href="globe.png">
-  <link rel="apple-touch-icon" href="globe.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
-  <meta name="description" content="">
-  <meta name="author" content="">
+function onLocationFound(e) {
+    
+    var radius = e.accuracy / 1;
 
-  <title>ANDREW LAMERS</title>
+    L.circle(e.latlng, radius).addTo(map);
+}
 
-  <!-- Bootstrap core CSS -->
-  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+map.on('locationfound', onLocationFound);
+        
+        
+// Add Data from CARTO using the SQL API
+// Declare Variables
+// Create Global Variable to hold CARTO points
+var cartoDBPoints = null;
+var cartoDPPoints2 = null;
+// Set your CARTO Username
+var cartoDBusername = "alamers3";
 
-  <!-- Custom styles for this template -->
-  <link href="css/the-big-picture.css" rel="stylesheet">
-  
-  
-</head>
+// Write SQL Selection Query to be Used on CARTO Table
+// Name of table is 'data_collector'
+var sqlQuery = "SELECT * FROM data_collector";
+var sqlQuery2 = "SELECT * FROM amenities";
+// Get CARTO selection as GeoJSON and Add to Map
+function getGeoJSON(){
+  $.getJSON("https://"+cartoDBusername+".cartodb.com/api/v2/sql?format=GeoJSON&q="+sqlQuery, function(data) {
+    cartoDBPoints = L.geoJson(data,{
+      pointToLayer: function(feature,latlng){
+        var marker = L.marker(latlng);
+        marker.bindPopup('' + feature.properties.requesttype + '<br> Submitted by: ' + feature.properties.name + '');
+        return marker;
+      }
+    }).addTo(map);
+  });
+};
 
-<body>
+var myIcon = L.icon({
+    iconUrl: '/data-collection/css/images/red_dot.png',
+});
+        
+function getGeoJSON2(){
+  $.getJSON("https://alamers3.cartodb.com/api/v2/sql?format=GeoJSON&q="+sqlQuery2, function(data) {
+    cartoDBPoints2 = L.geoJson(data,{
+      pointToLayer: function(feature,latlng){
+        var marker2 = L.marker(latlng,{icon: myIcon});
+        marker2.bindPopup(feature.properties.type);
+        return marker2;
+      }
+    }).addTo(map);
+  });
+};
+        
+// Use the jQuery UI dialog to create a dialog and set options
+var dialog = $("#dialog").dialog({
+  autoOpen: false,
+  height: 330,
+  width: 275,
+  modal: true,
+  position: {
+    my: "right top",
+    at: "right top",
+    of: "#body"
+  },
+  buttons: {
+    "Submit": setData,
+    Cancel: function() {
+      dialog.dialog("close");
+      map.removeLayer(drawnItems);
+    }
+  },
+  close: function() {
+    form[ 0 ].reset();
+    console.log("Dialog closed");
+  }
+});
 
-  <!-- Navigation -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
-    <div class="container">
-      <a class="navbar-brand" href="#">ANDREW LAMERS</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarResponsive">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="#">
-              <span class="sr-only">(current)</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">PORTFOLIO</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">RESUME</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">CONTACT</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+// Stops default form submission and ensures that setData or the cancel function run
+var form = dialog.find("form").on("submit", function(event) {
+  event.preventDefault();
+});
+ 
 
-  <!-- Page Content -->
-  <section>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6">
-          <h1 class="mt-5"></h1>
-          <p></p>
-        </div>
-      </div>
-    </div>
-  </section>
+var lc = L.control.locate({
+    position: 'topleft',
+    keepCurrentZoomLevel: 'True',
+    drawMarker: 'False',
+    icon: 'fa fa-crosshairs',
+    strings: {
+        title: "Find My Location"
+    }
+}).addTo(map);
 
-  <!-- Bootstrap core JavaScript -->
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+let layer;
+let input;
+        
+// Search
 
-</body>
+    const client = new carto.Client({
+        apiKey: 'e9355fa25f0aabcb829690292c7190115e2cf427',
+        username: 'alamers3'
+});
+    const source = new carto.source.SQL(`SELECT * FROM data_collector`);
 
+        $('#searchButton').click(function () {
+                    input = $("#ad").val();
+                    $.ajax({
+                    type: "GET",
+                    url: `https://alamers3.carto.com/api/v2/sql?format=geojson&q=SELECT * FROM parks where parkname Ilike '${input}'`,
+                    dataType: 'json',
+                    success: function (response) {
+                        geojsonLayer = L.geoJson(response)
+                        map.fitBounds(geojsonLayer.getBounds());     
+    }});
+        })
+
+// Create Leaflet Draw Control for the draw tools and toolbox
+var drawControl = new L.Control.Draw({
+  draw : {
+    polygon : false,
+    polyline : false,
+    rectangle : false,
+    circle : false
+  },
+  edit : false,
+  remove: false
+});
+
+// Function to add the draw control to the map to start editing
+map.addControl(drawControl);
+  controlOnMap = true;
+
+function Reports(){
+  if (map.hasLayer(cartoDBPoints)) {
+        map.removeLayer(cartoDBPoints);
+      }
+    else {
+        map.addLayer(cartoDBPoints);
+    };
+};
+        
+// Function to run when feature is drawn on map
+map.on('draw:created', function (e) {
+  var layer = e.layer;
+  drawnItems.addLayer(layer);
+  map.addLayer(drawnItems);
+  dialog.dialog("open");
+});
+
+// Create variable for Leaflet.draw features
+var drawnItems = new L.FeatureGroup();
+
+function setData() {
+    var enteredUsername = username.value;
+    var enteredDescription = description.value;
+    var enteredcontact = contact.value;
+    var enteredparkname = parkname.value;
+    var enteredrequesttype = requesttype.value;
+    
+    drawnItems.eachLayer(function (layer) {
+        var sql = "INSERT INTO data_collector (the_geom, description, name, latitude, longitude, contact, parkname, requesttype) VALUES (ST_SetSRID(ST_GeomFromGeoJSON('";
+        var a = layer.getLatLng();
+        var sql2 ='{"type":"Point","coordinates":[' + a.lng + "," + a.lat + "]}'),4326),'" + enteredDescription + "','" + enteredUsername + "','" + a.lat + "','" + a.lng +"','"+ enteredcontact +"','" + enteredparkname + "','" + enteredrequesttype +"')";
+        var pURL = sql+sql2;
+        submitToProxy(pURL);
+        console.log("Feature has been submitted to the Proxy");
+    });
+    map.removeLayer(drawnItems);
+    drawnItems = new L.FeatureGroup();
+    console.log("drawnItems has been cleared");
+    dialog.dialog("close");
+};
+        
+// Submit data to the PHP using a jQuery Post method
+var submitToProxy = function(q){
+    $.post("php/callProxy.php", { // <--- Enter the path to your callProxy.php file here
+        qurl:q,
+        cache: false,
+        timeStamp: new Date().getTime()
+      }, function(data) {
+        console.log(data);
+        refreshLayer();
+      });
+    };
+
+    // refresh the layers to show the updated dataset
+    function refreshLayer() {
+      if (map.hasLayer(cartoDBPoints)) {
+        map.removeLayer(cartoDBPoints);
+      };
+      getGeoJSON();
+    };
+        
+
+
+// Run showAll function automatically when document loads
+$( document ).ready(function() {
+  getGeoJSON();
+    getGeoJSON2();
+});
+    </script>
+  </body>
 </html>
