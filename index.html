@@ -2,7 +2,7 @@
 <html lang='en'>
 <meta charset="utf-8"/>
   <head>
-    <title>NR Parks App</title>
+    <title>SCBPTC</title>
     <link rel="stylesheet" href="css/leaflet.css" />
     <link rel="stylesheet" href="css/leaflet.draw.css" />
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
@@ -11,11 +11,11 @@
   <body>
     <div id="wrapper">
       <div id="header">
-        <h1>City of New Richmond - Park Reporter</h1>
+        <h1></h1>
       </div>
       <div id="map"></div>
       <div id="controls">
-          <p>Click points for more information, or submit a report by clicking the <img src="\data-collection\css\images\DrawIcon.png"> symbol.</br></p>
+          <p>Click points for more information, or submit a report by clicking the <img src="/css/images/DrawIcon.png"> symbol.</br></p>
         <input type="button" onclick="Reports()" value="Toggle Reports Layer on/off">
         <div id="searchbox">
         <input type="text" name="ad" value="" placeholder="Search by Park Name" id="ad" size="10" />
@@ -60,8 +60,8 @@
            
     // Create Leaflet map object
     var map = L.map('map',{ 
-        center: [45.1232020909774,-92.5373268127441 ], 
-        zoom: 14,
+        center: [45.0498, -92.4876], 
+        zoom: 11,
         layers: [basemap]
     });
 

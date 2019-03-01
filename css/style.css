@@ -24,7 +24,7 @@ h1 {
 #map {
   width: 100%;
   margin: 0 auto;
-  height: 90%;
+  height: 100%;
 }
 
 #controls {
@@ -37,11 +37,11 @@ h1 {
     background-color: #1111;
     opacity: 0.9;
     position: absolute;
-    top: 65px;
-    left: 50px;
+    top: 1%;
+    left: 5%;
     width: auto;
     height: auto;
-    padding: 10px;
+    padding: 1%;
     display: block;
     z-index: 9000;
         }
