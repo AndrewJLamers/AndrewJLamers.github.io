@@ -4,9 +4,12 @@
   <head>
     <title>SCBPTC</title>
     <link rel="stylesheet" href="css/leaflet.css" />
-    <link rel="stylesheet" href="css/leaflet.draw.css" />
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
+      
+      <!-- Load Esri Leaflet from CDN -->
+    <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
+      
   </head>
   <body>
     <div id="wrapper">
@@ -14,38 +17,8 @@
         <h1></h1>
       </div>
       <div id="map"></div>
-      <div id="controls">
-          <p>Click points for more information, or submit a report by clicking the <img src="/css/images/DrawIcon.png"> symbol.</br></p>
-        <input type="button" onclick="Reports()" value="Toggle Reports Layer on/off">
-        <div id="searchbox">
-        <input type="text" name="ad" value="" placeholder="Search by Park Name" id="ad" size="10" />
-        <button type="button" id="searchButton">Search</button>
-      </div>
-    </div>
-
-    <div id="dialog" title="Report Information">     
-      <form>
-        <fieldset style="border: none;">
-          <ul style="list-style-type: none; padding-left: 0px">
-            <li><label for="username"></label></li>
-            <li><input type="text" name="username" id="username" placeholder="Enter your name" class="text ui-widget-content ui-corner-all"></li>
-              <li><label for="RequestType"></label></li>
-            <li><input type="text" name="requesttype" id="requesttype" placeholder="Request Type" class="text ui-widget-content ui-corner-all"></li>
-            <li><label for="description"></label></li>
-            <li><input type="text" name="description" id="description" placeholder="Description" class="text ui-widget-content ui-corner-all"></li>
-              <li><label for="contact"></label></li>
-            <li><input type="text" name="contact" id="contact" placeholder="Phone/Email" class="text ui-widget-content ui-corner-all"></li>
-                <li><label for="ParkName"></label></li>
-            <li><input type="text" name="parkname" id="parkname" placeholder="Park Name" class="text ui-widget-content ui-corner-all"></li>
-          </ul>
-          <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-        </fieldset>
-      </form>
-    </div>
 
     <script src="js/leaflet.js"></script>
-    <script src="js/leaflet.draw.js"></script>
-     <script src="https://cartodb-libs.global.ssl.fastly.net/carto.js/v4.0.0-beta.4/carto.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="/data-collection/js/jquery-3.3.1.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
@@ -69,7 +42,7 @@
         "aerial": aerial,
         "base": basemap
     };     
-        
+          
 // Add Tile Layer basemap
 L.control.layers(baseMaps).addTo(map);
      
@@ -83,77 +56,6 @@ function onLocationFound(e) {
 
 map.on('locationfound', onLocationFound);
         
-        
-// Add Data from CARTO using the SQL API
-// Declare Variables
-// Create Global Variable to hold CARTO points
-var cartoDBPoints = null;
-var cartoDPPoints2 = null;
-// Set your CARTO Username
-var cartoDBusername = "alamers3";
-
-// Write SQL Selection Query to be Used on CARTO Table
-// Name of table is 'data_collector'
-var sqlQuery = "SELECT * FROM data_collector";
-var sqlQuery2 = "SELECT * FROM amenities";
-// Get CARTO selection as GeoJSON and Add to Map
-function getGeoJSON(){
-  $.getJSON("https://"+cartoDBusername+".cartodb.com/api/v2/sql?format=GeoJSON&q="+sqlQuery, function(data) {
-    cartoDBPoints = L.geoJson(data,{
-      pointToLayer: function(feature,latlng){
-        var marker = L.marker(latlng);
-        marker.bindPopup('' + feature.properties.requesttype + '<br> Submitted by: ' + feature.properties.name + '');
-        return marker;
-      }
-    }).addTo(map);
-  });
-};
-
-var myIcon = L.icon({
-    iconUrl: '/data-collection/css/images/red_dot.png',
-});
-        
-function getGeoJSON2(){
-  $.getJSON("https://alamers3.cartodb.com/api/v2/sql?format=GeoJSON&q="+sqlQuery2, function(data) {
-    cartoDBPoints2 = L.geoJson(data,{
-      pointToLayer: function(feature,latlng){
-        var marker2 = L.marker(latlng,{icon: myIcon});
-        marker2.bindPopup(feature.properties.type);
-        return marker2;
-      }
-    }).addTo(map);
-  });
-};
-        
-// Use the jQuery UI dialog to create a dialog and set options
-var dialog = $("#dialog").dialog({
-  autoOpen: false,
-  height: 330,
-  width: 275,
-  modal: true,
-  position: {
-    my: "right top",
-    at: "right top",
-    of: "#body"
-  },
-  buttons: {
-    "Submit": setData,
-    Cancel: function() {
-      dialog.dialog("close");
-      map.removeLayer(drawnItems);
-    }
-  },
-  close: function() {
-    form[ 0 ].reset();
-    console.log("Dialog closed");
-  }
-});
-
-// Stops default form submission and ensures that setData or the cancel function run
-var form = dialog.find("form").on("submit", function(event) {
-  event.preventDefault();
-});
- 
 
 var lc = L.control.locate({
     position: 'topleft',
@@ -165,113 +67,6 @@ var lc = L.control.locate({
     }
 }).addTo(map);
 
-let layer;
-let input;
-        
-// Search
-
-    const client = new carto.Client({
-        apiKey: 'e9355fa25f0aabcb829690292c7190115e2cf427',
-        username: 'alamers3'
-});
-    const source = new carto.source.SQL(`SELECT * FROM data_collector`);
-
-        $('#searchButton').click(function () {
-                    input = $("#ad").val();
-                    $.ajax({
-                    type: "GET",
-                    url: `https://alamers3.carto.com/api/v2/sql?format=geojson&q=SELECT * FROM parks where parkname Ilike '${input}'`,
-                    dataType: 'json',
-                    success: function (response) {
-                        geojsonLayer = L.geoJson(response)
-                        map.fitBounds(geojsonLayer.getBounds());     
-    }});
-        })
-
-// Create Leaflet Draw Control for the draw tools and toolbox
-var drawControl = new L.Control.Draw({
-  draw : {
-    polygon : false,
-    polyline : false,
-    rectangle : false,
-    circle : false
-  },
-  edit : false,
-  remove: false
-});
-
-// Function to add the draw control to the map to start editing
-map.addControl(drawControl);
-  controlOnMap = true;
-
-function Reports(){
-  if (map.hasLayer(cartoDBPoints)) {
-        map.removeLayer(cartoDBPoints);
-      }
-    else {
-        map.addLayer(cartoDBPoints);
-    };
-};
-        
-// Function to run when feature is drawn on map
-map.on('draw:created', function (e) {
-  var layer = e.layer;
-  drawnItems.addLayer(layer);
-  map.addLayer(drawnItems);
-  dialog.dialog("open");
-});
-
-// Create variable for Leaflet.draw features
-var drawnItems = new L.FeatureGroup();
-
-function setData() {
-    var enteredUsername = username.value;
-    var enteredDescription = description.value;
-    var enteredcontact = contact.value;
-    var enteredparkname = parkname.value;
-    var enteredrequesttype = requesttype.value;
-    
-    drawnItems.eachLayer(function (layer) {
-        var sql = "INSERT INTO data_collector (the_geom, description, name, latitude, longitude, contact, parkname, requesttype) VALUES (ST_SetSRID(ST_GeomFromGeoJSON('";
-        var a = layer.getLatLng();
-        var sql2 ='{"type":"Point","coordinates":[' + a.lng + "," + a.lat + "]}'),4326),'" + enteredDescription + "','" + enteredUsername + "','" + a.lat + "','" + a.lng +"','"+ enteredcontact +"','" + enteredparkname + "','" + enteredrequesttype +"')";
-        var pURL = sql+sql2;
-        submitToProxy(pURL);
-        console.log("Feature has been submitted to the Proxy");
-    });
-    map.removeLayer(drawnItems);
-    drawnItems = new L.FeatureGroup();
-    console.log("drawnItems has been cleared");
-    dialog.dialog("close");
-};
-        
-// Submit data to the PHP using a jQuery Post method
-var submitToProxy = function(q){
-    $.post("php/callProxy.php", { // <--- Enter the path to your callProxy.php file here
-        qurl:q,
-        cache: false,
-        timeStamp: new Date().getTime()
-      }, function(data) {
-        console.log(data);
-        refreshLayer();
-      });
-    };
-
-    // refresh the layers to show the updated dataset
-    function refreshLayer() {
-      if (map.hasLayer(cartoDBPoints)) {
-        map.removeLayer(cartoDBPoints);
-      };
-      getGeoJSON();
-    };
-        
-
-
-// Run showAll function automatically when document loads
-$( document ).ready(function() {
-  getGeoJSON();
-    getGeoJSON2();
-});
     </script>
   </body>
 </html>
