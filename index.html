@@ -1,166 +1,76 @@
 <!DOCTYPE html>
-<html lang='en'>
-<meta charset="utf-8"/>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>SCBPTC</title>
-    <!-- Load Leaflet from CDN -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<html lang="en">
 
-    <!-- Load Esri Leaflet from CDN -->
-    <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
-    
-    <!-- Load Leaflet plugins -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.65.1/dist/L.Control.Locate.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.65.1/dist/L.Control.Locate.min.js" charset="utf-8"></script>
-      <style>
-          html, body, #map {
-              margin:0; padding:0;  width : 100%; height : 100%;
-          }
-          
-          .my-custom-control {
-              background-image: url('SCBPTC.png');
-              width:114px; 
-              height:84px;
-          }
-      </style>
-    </head>
-    <body>      
-    <div id="map"></div>
-    <script>         
-    var aerial = L.tileLayer('https://api.mapbox.com/styles/v1/andrewjlamers/cje6jt48r8i7g2rl7wenzgvnx/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYW5kcmV3amxhbWVycyIsImEiOiJjaXNqcmtwOWEwMmtyMnRvY3kxOXQzbGlmIn0.eEJxZgEUsJXVHlUyHOWMdw'),
-    basemap = L.tileLayer('https://api.mapbox.com/styles/v1/andrewjlamers/civr1q40n00582jm9jkc1mf8q/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYW5kcmV3amxhbWVycyIsImEiOiJjaXNqcmtwOWEwMmtyMnRvY3kxOXQzbGlmIn0.eEJxZgEUsJXVHlUyHOWMdw');
-        
-// Create Leaflet map object
-    var map = L.map('map',{ 
-        center: [45.0498, -92.4876], 
-        zoom: 11,
-        minZoom: 11,
-        maxZoom: 18,        
-        layers: [basemap]
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Simple Sidebar - Start Bootstrap Template</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/simple-sidebar.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <div class="d-flex" id="wrapper">
+
+    <!-- Sidebar -->
+    <div class="bg-light border-right" id="sidebar-wrapper">
+        <div class="sidebar-heading"><stong>-&ensp;-&ensp;.&ensp;&ensp;&ensp;.&ensp;.&ensp;&ensp;&ensp;.&ensp;.&ensp;.</stong></div>
+      <div class="list-group list-group-flush">
+        <a href="index.html" class="list-group-item list-group-item-action bg-light">Andrew Lamers</a>
+        <a href="Portfolio/Portfolio.html" class="list-group-item list-group-item-action bg-light">Portfolio</a>
+        <a href="Resume/Resume.html" class="list-group-item list-group-item-action bg-light">Resume</a>
+        <a href="SCC_Trails/SCC_Trails.html" class="list-group-item list-group-item-action bg-light">Trails Coalition</a>
+        <a href="https://www.linkedin.com/in/andrewjlamers/" target="_blank" class="list-group-item list-group-item-action bg-light">LinkedIn</a>
+        <a href="mailto:AndrewJLamers@gmail.com?Subject=Website%20Contact" target="_top" class="list-group-item list-group-item-action bg-light">Contact</a>
+        <a class="list-group-item list-group-item-action bg-light"></a>
+      </div>
+    </div>
+    <!-- /#sidebar-wrapper -->
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+
+      <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <button class="btn btn-primary" id="menu-toggle">Toggle Menu</button>
+      </nav>
+
+      <div class="container-fluid">
+        <h1 class="mt-4">Welcome! Bienvenue! Bienvenido!</h1><br>
+        <p>My name is Andrew Lamers, I'm a Geographic Information Systems (GIS) Professional and this is my online portfolio.</p>
+        <p>I was introduced to GIS in 2008, by Dr. Ron Ward, while attending Normandale Community College.<br> Several geography classes were required for an Associate degree from Normandale, and I found Dr. Ward to be an engaging and insightful professor.  After taking several of his courses, I realized I would graduate with an Associate of Arts in Geography.  Jokingly, I said "what am I supposed to do with a geography degree"? to which he replied, "have you heard of GIS?". </p>
+        <p>Once my associate degree was complete, I transfered to the University of Minnesota where I would major in GIS while pursuing a Bachelor of Science degree.  In May 2011, I graduated from the U of M and began working for the City of Eden Prairie.</p>
+        <p>After working in the public sector, as a GIS technician and IT/GIS Analyst, I decided to return to school for a Master's degree in GIS/Cartography.  Continuing to work while completing my Master's landed me a job at SEH Inc, a private engineering firm, where I currently work as their GIS Administrator.</p>
+        <br>
+        <p>On this site you'll find my portfolio, resume, and contact information. <br> I'm an active volunteer and happy to help, send me an email or connect with me on LinkedIn.</p>
+        </div>
+    </div>
+    <!-- /#page-content-wrapper -->
+
+  </div>
+  <!-- /#wrapper -->
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Menu Toggle Script -->
+  <script>
+    $("#menu-toggle").click(function(e) {
+      e.preventDefault();
+      $("#wrapper").toggleClass("toggled");
     });
+  </script>
 
-    var baseMaps = {
-        "Aerial": aerial,
-        "Streets": basemap,
-    };
-        
-    // Add Tile Layer basemap
-L.control.layers(baseMaps).addTo(map);
-        
-        
-        
-        
+</body>
 
-var testData = {
-                        "type": "FeatureCollection",
-                        "features": [
-                            {
-                                "geometry": {
-                                    "type": "Point",
-                                    "coordinates": [
-                                        -92.789,
-                                        45.0498
-                                    ]
-                                },
-                                "type": "Feature",
-                                "properties": {
-                                    "lon": -73.97364044189453,
-                                    "lat": 40.66893768310547,
-                                }
-                            },
-                            {
-                                "geometry": {
-                                    "type": "Point",
-                                    "coordinates": [
-                                        -92.4876,
-                                        45.0498
-                                    ]
-                                },
-                                "type": "Feature",
-                                "properties": {
-                                    "lon": -73.96121215820312,
-                                    "lat": 40.66240692138672,
-                                }
-                            }
-                        ]
-                    }
-       
-        var geojsonMarkerOptions = {
-            radius: 10,
-            fillColor: "rgb(255,0,195)",
-            color: "#fff",
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 1
-        };
-        // load the geojson to the map with marker styling
-        L.geoJson(testData, {
-            pointToLayer: function (feature, latlng) {
-                var popupOptions = {maxWidth: 200};
-                var popupContent = "This is some content";
-                return L.circleMarker(latlng, geojsonMarkerOptions).bindPopup(popupContent,popupOptions);
-            }
-        }).addTo(map);   
-        
-        
-
-            
-        
-var trails = L.esri.featureLayer({
-        url: "https://gis.sccwi.gov/arcgis/rest/services/BikePaths/MapServer/0",
-        style: 
-          function () {
-          return { color: "#70ca49", weight: 3 };
-        }
-      }).addTo(map);
-        
-
-        
-var popupTemplate = "<h3>{PrelimRec}</h3>Road Class: {roadclass}<br>Network Type: {Ntwrk_Typ}";
-
-      trails.bindPopup(function(e){
-        return L.Util.template(popupTemplate, e.feature.properties)
-      });
-        
-function onLocationFound(e) {
-    
-    var radius = e.accuracy / 1;
-
-    L.circle(e.latlng, radius).addTo(map);
-}
-
-map.on('locationfound', onLocationFound);
- 
-
-var lc = L.control.locate({
-    position: 'topleft',
-    keepCurrentZoomLevel: 'True',
-    drawMarker: 'False',
-    icon: 'fa fa-crosshairs',
-    strings: {
-        title: "Find My Location"
-    }
-}).addTo(map);
-
-var MyControl = L.Control.extend({
-    options: {
-      position: 'bottomleft'
-    },
-
-    onAdd: function (map) {
-      // create the control container with a particular class name
-      // ** you can add the image to the div as a background image using css
-      var container = L.DomUtil.create('div', 'my-custom-control');
-
-      // ... initialize other DOM elements, add listeners, etc.
-      return container;
-    }
-});    
-map.addControl(new MyControl());
-    </script>
-      
-  </body>
 </html>
