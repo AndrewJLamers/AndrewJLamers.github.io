@@ -37,7 +37,7 @@
     var map = L.map('map',{ 
         center: [45.0498, -92.4876], 
         zoom: 11,
-        minZoom: 11,
+        minZoom: 9,
         maxZoom: 18,        
         layers: [basemap]
     });
@@ -61,8 +61,22 @@ var testData = {
                                 "geometry": {
                                     "type": "Point",
                                     "coordinates": [
-                                        -92.789,
-                                        45.0498
+                                        -92.537590,
+                                        45.121602
+                                    ]
+                                },
+                                "type": "Feature",
+                                "properties": {
+                                    "lon": -73.97364044189453,
+                                    "lat": 40.66893768310547,
+                                }
+                            },
+							{
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        -92.554642,
+                                        44.983403
                                     ]
                                 },
                                 "type": "Feature",
@@ -75,8 +89,8 @@ var testData = {
                                 "geometry": {
                                     "type": "Point",
                                     "coordinates": [
-                                        -92.4876,
-                                        45.0498
+                                        -92.756976,
+                                        44.975912
                                     ]
                                 },
                                 "type": "Feature",
@@ -89,23 +103,58 @@ var testData = {
                     }
        
         var geojsonMarkerOptions = {
-            radius: 10,
+            radius: 8,
             fillColor: "rgb(255,0,195)",
             color: "#fff",
             weight: 2,
             opacity: 1,
-            fillOpacity: 1
+            fillOpacity: .5
         };
         // load the geojson to the map with marker styling
         L.geoJson(testData, {
             pointToLayer: function (feature, latlng) {
                 var popupOptions = {maxWidth: 200};
-                var popupContent = "This is some content";
+                var popupContent = "Food, drinks, and amenities";
                 return L.circleMarker(latlng, geojsonMarkerOptions).bindPopup(popupContent,popupOptions);
             }
         }).addTo(map);   
         
-        
+var testData = {
+                        "type": "FeatureCollection",
+                        "features": [
+                            {
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        -92.789,
+                                        45.0498
+                                    ]
+                                },
+                                "type": "Feature",
+                                "properties": {
+                                    "lon": -73.97364044189453,
+                                    "lat": 40.66893768310547,
+                                }
+                            }
+                        ]
+                    }
+       
+        var geojsonMarkerOptions = {
+            radius: 10,
+            fillColor: "rgb(255,165,0)",
+            color: "#fff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: .75
+        };
+        // load the geojson to the map with marker styling
+        L.geoJson(testData, {
+            pointToLayer: function (feature, latlng) {
+                var popupOptions = {maxWidth: 200};
+                var popupContent = "Visit the St.Croix Loop Trail";
+                return L.circleMarker(latlng, geojsonMarkerOptions).bindPopup(popupContent,popupOptions);
+            }
+        }).addTo(map);
 
             
         
