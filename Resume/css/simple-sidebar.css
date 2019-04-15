@@ -49,3 +49,6 @@ body {
     margin-left: -15rem;
   }
 }
+.inline-block {
+   display: inline-block;
+}
