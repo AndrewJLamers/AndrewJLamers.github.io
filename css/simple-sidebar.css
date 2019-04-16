@@ -5,6 +5,7 @@
  */
 body {
   overflow-x: hidden;
+  background: rgba(130, 204, 255, 0.2);
 }
 
 #sidebar-wrapper {
