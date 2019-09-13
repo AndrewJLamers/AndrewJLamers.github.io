@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang='en'>
+<meta charset="utf-8"/>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>SCBPTC</title>
+    <!-- Load Leaflet from CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Load Esri Leaflet from CDN -->
+    <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
+    
+    <!-- Load Leaflet plugins -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.65.1/dist/L.Control.Locate.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.65.1/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+      <style>
+          html, body, #map {
+              margin:0; padding:0;  width : 100%; height : 100%;
+          }
+          
+          .my-custom-control {
+              background-image: url('SCBPTC.png');
+              width:114px; 
+              height:84px;
+          }
+      </style>
+    </head>
+    <body>      
+    <div id="map"></div>
+    <script>         
+    var aerial = L.tileLayer('https://api.mapbox.com/styles/v1/andrewjlamers/cje6jt48r8i7g2rl7wenzgvnx/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYW5kcmV3amxhbWVycyIsImEiOiJjaXNqcmtwOWEwMmtyMnRvY3kxOXQzbGlmIn0.eEJxZgEUsJXVHlUyHOWMdw'),
+    basemap = L.tileLayer('https://api.mapbox.com/styles/v1/andrewjlamers/civr1q40n00582jm9jkc1mf8q/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYW5kcmV3amxhbWVycyIsImEiOiJjaXNqcmtwOWEwMmtyMnRvY3kxOXQzbGlmIn0.eEJxZgEUsJXVHlUyHOWMdw');
+        
+// Create Leaflet map object
+    var map = L.map('map',{ 
+        center: [45.0498, -92.4876], 
+        zoom: 11,
+        minZoom: 9,
+        maxZoom: 18,        
+        layers: [basemap]
+    });
+
+    var baseMaps = {
+        "Aerial": aerial,
+        "Streets": basemap,
+    };
+        
+    // Add Tile Layer basemap
+L.control.layers(baseMaps).addTo(map);
+        
+        
+        
+        
+
+var testData = {
+                        "type": "FeatureCollection",
+                        "features": [
+                            {
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        -92.537590,
+                                        45.121602
+                                    ]
+                                },
+                                "type": "Feature",
+                                "properties": {
+                                    "city": "New Richmond",
+                                }
+                            },
+                            {
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        -92.675876,
+                                        45.123635
+                                    ]
+                                },
+                                "type": "Feature",
+                                "properties": {
+                                    "city": "Somerset",
+                                }
+                            },
+                            {
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        -92.756976,
+                                        44.975912
+                                    ]
+                                },
+                                "type": "Feature",
+                                "properties": {
+                                    "city": "Hudson",
+                                }
+                            },
+                            {
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        -92.723843,
+                                        44.959279
+                                    ]
+                                },
+                                "type": "Feature",
+                                "properties": {
+                                    "city": "HudsonSo",
+                                }
+                            },
+                            {
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        -92.291338,
+                                        44.953024
+                                    ]
+                                },
+                                "type": "Feature",
+                                "properties": {
+                                    "city": "Woodville",
+                                }
+                            },
+                            {
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        -92.621758,
+                                        44.872099
+                                    ]
+                                },
+                                "type": "Feature",
+                                "properties": {
+                                    "city": "River Falls",
+                                }
+                            }
+                        ]
+                    }
+       
+        var geojsonMarkerOptions = {
+            radius: 8,
+            fillColor: "rgb(255,0,195)",
+            color: "#fff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: .5
+        };
+        // load the geojson to the map with marker styling
+        L.geoJson(testData, {
+            pointToLayer: function (feature, latlng) {
+                var popupOptions = {maxWidth: 200};
+                var popupContent = "Food, drinks, and amenities";
+                return L.circleMarker(latlng, geojsonMarkerOptions).bindPopup(popupContent,popupOptions);
+            }
+        }).addTo(map);   
+        
+var testData = {
+                        "type": "FeatureCollection",
+                        "features": [
+                            {
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        -92.789,
+                                        45.0498
+                                    ]
+                                },
+                                "type": "Feature",
+                                "properties": {
+                                    "lon": -73.97364044189453,
+                                    "lat": 40.66893768310547,
+                                }
+                            }
+                        ]
+                    }
+       
+        var geojsonMarkerOptions = {
+            radius: 10,
+            fillColor: "rgb(255,165,0)",
+            color: "#fff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: .75
+        };
+        // load the geojson to the map with marker styling
+        L.geoJson(testData, {
+            pointToLayer: function (feature, latlng) {
+                var popupOptions = {maxWidth: 200};
+                var popupContent = "Visit the St.Croix Loop Trail";
+                return L.circleMarker(latlng, geojsonMarkerOptions).bindPopup(popupContent,popupOptions);
+            }
+        }).addTo(map);
+
+            
+        
+var trails = L.esri.featureLayer({
+        url: "https://gis.sccwi.gov/arcgis/rest/services/BikePaths/MapServer/0",
+        style: 
+          function () {
+          return { color: "#70ca49", weight: 3 };
+        }
+      }).addTo(map);
+        
+
+        
+var popupTemplate = "<h3>{PrelimRec}</h3>Road Class: {roadclass}<br>Network Type: {Ntwrk_Typ}";
+
+      trails.bindPopup(function(e){
+        return L.Util.template(popupTemplate, e.feature.properties)
+      });
+        
+function onLocationFound(e) {
+    
+    var radius = e.accuracy / 1;
+
+    L.circle(e.latlng, radius).addTo(map);
+}
+
+map.on('locationfound', onLocationFound);
+ 
+
+var lc = L.control.locate({
+    position: 'topleft',
+    keepCurrentZoomLevel: 'True',
+    drawMarker: 'False',
+    icon: 'fa fa-crosshairs',
+    strings: {
+        title: "Find My Location"
+    }
+}).addTo(map);
+
+var MyControl = L.Control.extend({
+    options: {
+      position: 'bottomleft'
+    },
+
+    onAdd: function (map) {
+      // create the control container with a particular class name
+      // ** you can add the image to the div as a background image using css
+      var container = L.DomUtil.create('div', 'my-custom-control');
+
+      // ... initialize other DOM elements, add listeners, etc.
+      return container;
+    }
+});    
+map.addControl(new MyControl());
+    </script>
+      
+  </body>
+</html>
